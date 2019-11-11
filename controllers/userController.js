@@ -1,36 +1,45 @@
 var User = require('../models/userModel');
-var async = require('async');
 const { body, validationResult } = require('express-validator');
 const { sanitizeBody } = require('express-validator');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+var jwt = require('jsonwebtoken');
+
 
 exports.user_login_get = function(req, res) {
   User.findOne({ 'login': req.body.login })
     .lean()
     .select('login password email name age')
-    .exec(function (err, user) {
+    .exec(async function (err, user) {
     if (err){
       return handleError(err);
     }
-    delete user.password;
-    res.json(user);
+      const match = await bcrypt.compare(req.body.password, user.password);
+
+      if(match) {
+        delete user.password;
+        const token = await jwt.sign(user, 'gbf4wregwgr4e63resg', { expiresIn: '7d' });
+        res.json({user, token});
+      }
   })
 };
 
 exports.user_register_post = function(req, res) {
-
-    var user = new User(
-      {
-        login: req.body.login,
-        password: req.body.password,
-        email: req.body.email,
-        name: req.body.name,
-        age: req.body.age
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+      var user = new User(
+        {
+          login: req.body.login,
+          password: hash,
+          email: req.body.email,
+          name: req.body.name,
+          age: req.body.age
+        });
+      user.save(function (err) {
+        if (err) {
+          return  res.json(err);
+        }
+        res.send('registration success');
       });
-    user.save(function (err) {
-      if (err) {
-        return  res.json(err);
-      }
-      res.json(user);
     });
   };
 
