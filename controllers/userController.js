@@ -14,13 +14,21 @@ exports.user_login_get = function(req, res) {
     if (err){
       return handleError(err);
     }
-      const match = await bcrypt.compare(req.body.password, user.password);
 
-      if(match) {
-        delete user.password;
-        const token = await jwt.sign(user, 'gbf4wregwgr4e63resg', { expiresIn: '7d' });
-        res.json({user, token});
-      }
+    if (!user) {
+     return  res.json({success: false, error: "user was not found"});
+    }
+
+    const match = await bcrypt.compare(req.body.password, user.password);
+
+    if(match) {
+      delete user.password;
+      const token = await jwt.sign(user, 'gbf4wregwgr4e63resg', { expiresIn: '7d' });
+      return res.json({user, token, success: true});
+    }
+
+    res.json({authValid});
+
   })
 };
 
@@ -32,7 +40,7 @@ exports.user_register_post = function(req, res) {
           password: hash,
           email: req.body.email,
           name: req.body.name,
-          age: req.body.age
+          age: parseInt(req.body.age)
         });
       user.save(function (err) {
         if (err) {

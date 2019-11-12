@@ -4,7 +4,7 @@ var user_controller = require('../controllers/userController');
 var auth = require('../lib/auth');
 
 /* GET users listing. */
-router.get('/login', user_controller.user_login_get);
+router.post('/login', user_controller.user_login_get);
 router.post('/register', user_controller.user_register_post);
 
 // router.get('/', auth.bearerAuth, user_controller.user_info);
