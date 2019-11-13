@@ -1,10 +1,8 @@
 var User = require('../models/userModel');
-const { body, validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
+const { body, validationResult, sanitizeBody } = require('express-validator');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 var jwt = require('jsonwebtoken');
-
 
 exports.user_login_get = function(req, res) {
   User.findOne({ 'login': req.body.login })
