@@ -8,7 +8,8 @@ var UserSchema = new Schema(
     password: {type: String, min: 6},
     email: {type: String},
     name: {type: String},
-    age: {type: Number, min: 18, max: 130}
+    age: {type: Number, min: 18, max: 130},
+    sex: {type: String, enum: ['male', 'female', 'unspecified'], default: 'unspecified'}
   }
 );
 
